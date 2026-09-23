@@ -1,0 +1,127 @@
+KUCH GALAT LAGE YAA KUCH EXTRA CHAIYE HO TOH AEK NEW UPDATE FILE MAI BATAYE
+# Question 3: Custom Variables + Manual Approval Gate Deploy Pipeline
+
+## Files to create in the GitHub repo
+
+**app.py**
+```python
+print("Deploying application version 1.0...")
+print("Deployment complete.")
+```
+
+**Jenkinsfile**
+```groovy
+pipeline {
+    agent any
+    environment {
+        APP_NAME = 'GradeBookApp'
+        APP_VERSION = '1.0.0'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/<student-username>/<repo-name>.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                bat 'python -m py_compile app.py'
+                echo 'Build successful: app.py compiled with no syntax errors'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                input message: "Approve deployment of ${env.APP_NAME} version ${env.APP_VERSION}?", ok: 'Release'
+                bat 'python app.py'
+            }
+        }
+    }
+}
+```
+
+## Execution procedure
+
+1. Create a new GitHub repo, add `app.py` and `Jenkinsfile`, and push.
+2. In Jenkins, create a new Pipeline job pointing to this repo.
+3. Click **Build Now**.
+4. Watch the pipeline pass through Checkout and Build, then stop at Deploy. A prompt appears reading **"Approve deployment of GradeBookApp version 1.0.0?"** with a button labelled **Release** and an **Abort** option.
+
+### Outcome 1 — Click Release
+5. Click **Release**. The pipeline resumes, runs `python app.py`, and the console shows `Deploying application version 1.0...` followed by `Deployment complete.` The build finishes and is marked **success (green)**.
+
+### Outcome 2 — Click Abort
+6. Run the build again (**Build Now**). When it reaches the Deploy stage and shows the same approval prompt, click **Abort** instead.
+7. The pipeline stops immediately at that point. `app.py` never runs. The build is marked **aborted**.
+
+---
+
+# Question 4: Built-in Environment Variables + Linting Pipeline
+
+## Files to create in the GitHub repo
+
+**app.py**
+```python
+def greet(name):
+    return "Hello, " + name
+```
+
+**Jenkinsfile**
+```groovy
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/<student-username>/<repo-name>.git'
+            }
+        }
+        stage('Show Build Info') {
+            steps {
+                echo "Build Number: ${env.BUILD_NUMBER}"
+                echo "Job Name: ${env.JOB_NAME}"
+                echo "Workspace: ${env.WORKSPACE}"
+            }
+        }
+        stage('Run Linter') {
+            steps {
+                bat 'flake8 app.py'
+            }
+        }
+    }
+}
+```
+
+## Execution procedure
+
+1. Create a new GitHub repo, add `app.py` and `Jenkinsfile`, then push.
+2. In Jenkins, create a new Pipeline job pointing to this repo.
+3. Click **Build Now**. Open Console Output for this build (build **#1**), e.g.:
+   - `Build Number: 1`
+   - `Job Name: <your-job-name>`
+   - `Workspace: C:\...\workspace\<your-job-name>`
+4. **Run Linter** passes with no flake8 output.
+5. Click **Build Now** again (build **#2**). Open Console Output for this second build.
+
+## Comparison
+
+| Variable | Build #1 | Build #2 | Changed? |
+|---|---|---|---|
+| `BUILD_NUMBER` | 1 | 2 | Yes |
+| `JOB_NAME` | same job name | same job name | No |
+| `WORKSPACE` | same path | same path | No |
+
+## Introducing the linter failure
+
+6. Edit `app.py` to add an unused import:
+```python
+import os
+
+def greet(name):
+    return "Hello, " + name
+```
+7. Push the change and rebuild (build **#3**).
+8. Open Console Output. The **Run Linter** stage fails, reporting:
+```
+app.py:1:1: F401 'os' imported but unused
+```
+9. The pipeline stops at **Run Linter**, and the build is marked **failed (red)**.
