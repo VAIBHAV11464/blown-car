@@ -12,3 +12,5 @@ Info stage should print BUILD_NUMBER, JOB_NAME, and WORKSPACE, and the Run Linte
 should run flake8 on an app.py containing a greet(name) function. Run the build twice and
 compare which values change and which stay the same. Then add an unused import to app.py,
 rebuild, and show the linter failure.
+
+ur ticket will be processed soon
