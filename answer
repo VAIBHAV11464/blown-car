@@ -4,13 +4,10 @@ KUCH GALAT LAGE YAA KUCH EXTRA CHAIYE HO TOH AEK NEW UPDATE FILE MAI BATAYE
 ## Files to create in the GitHub repo
 
 **app.py**
-```python
 print("Deploying application version 1.0...")
 print("Deployment complete.")
-```
 
 **Jenkinsfile**
-```groovy
 pipeline {
     agent any
     environment {
@@ -37,7 +34,7 @@ pipeline {
         }
     }
 }
-```
+
 
 ## Execution procedure
 
@@ -60,13 +57,10 @@ pipeline {
 ## Files to create in the GitHub repo
 
 **app.py**
-```python
 def greet(name):
     return "Hello, " + name
-```
 
 **Jenkinsfile**
-```groovy
 pipeline {
     agent any
     stages {
@@ -89,7 +83,7 @@ pipeline {
         }
     }
 }
-```
+
 
 ## Execution procedure
 
@@ -113,12 +107,11 @@ pipeline {
 ## Introducing the linter failure
 
 6. Edit `app.py` to add an unused import:
-```python
 import os
 
 def greet(name):
     return "Hello, " + name
-```
+
 7. Push the change and rebuild (build **#3**).
 8. Open Console Output. The **Run Linter** stage fails, reporting:
 ```
