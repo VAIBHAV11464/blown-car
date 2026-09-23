@@ -1,1 +1,14 @@
+Question 3
+Design a pipeline with the stages Checkout, Build (a compile check of app.py using
+py_compile), and Deploy. Define APP_NAME and APP_VERSION as custom variables in an
+environment block. The Deploy stage must pause with an input step that asks "Approve
+deployment of <APP_NAME> version <APP_VERSION>?" and has an OK button labelled
+"Release". It should then run app.py. Demonstrate both outcomes, clicking Release in one build
+and Abort in another, and explain the result of each.
 
+Question 4
+Create a pipeline with the stages Checkout, Show Build Info, and Run Linter. The Show Build
+Info stage should print BUILD_NUMBER, JOB_NAME, and WORKSPACE, and the Run Linter stage
+should run flake8 on an app.py containing a greet(name) function. Run the build twice and
+compare which values change and which stay the same. Then add an unused import to app.py,
+rebuild, and show the linter failure.
